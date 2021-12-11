@@ -11,16 +11,16 @@ export function partOne(input: Buffer) {
   const answer = F.flow(
     parse,
     F.reduce(
-      ([pos, depth], [d, a]) => {
-        switch (d) {
+      ([pos, depth], [t, n]) => {
+        switch (t) {
           case "f":
-            pos += a;
+            pos += n;
             break;
           case "d":
-            depth += a;
+            depth += n;
             break;
           case "u":
-            depth -= a;
+            depth -= n;
             break;
         }
         return [pos, depth];
@@ -33,4 +33,25 @@ export function partOne(input: Buffer) {
   return answer(input);
 }
 
-export function partTwo(input: Buffer) {}
+export const partTwo = F.flow(
+  parse,
+  F.reduce(
+    ([pos, depth, aim], [t, n]) => {
+      switch (t) {
+        case "f":
+          pos += n;
+          depth += aim * n;
+          break;
+        case "d":
+          aim += n;
+          break;
+        case "u":
+          aim -= n;
+          break;
+      }
+      return [pos, depth, aim];
+    },
+    [0, 0, 0],
+  ),
+  ([pos, depth]) => pos * depth,
+);
