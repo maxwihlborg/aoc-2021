@@ -4,6 +4,7 @@ sh: yarn prettier -w src/<%= String(name).padStart(2, '0') %>/index.spec.ts
 ---
 import { partOne, partTwo } from './index'
 import { expect } from 'chai'
+import { tap } from 'lodash/fp'
 import path from 'path'
 import fs from 'fs/promises'
 
@@ -20,7 +21,7 @@ describe('day <%= String(name).padStart(2, '0') %>', ()=>{
   })
 
   it('partOne (input)', async () => {
-    expect(partOne(await fs.readFile(INPUT_FILE))).to.be('number')
+    expect(tap(console.log, partOne(await fs.readFile(INPUT_FILE)))).to.be.a('number')
   })
 
   it('partTwo (input)', async () => {
@@ -28,6 +29,6 @@ describe('day <%= String(name).padStart(2, '0') %>', ()=>{
   })
 
   it('partTwo (input)', async () => {
-    expect(partTwo(await fs.readFile(INPUT_FILE))).to.be('number')
+    expect(tap(console.log, partTwo(await fs.readFile(INPUT_FILE)))).to.be.a('number')
   })
 })

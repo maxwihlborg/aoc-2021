@@ -29,18 +29,13 @@ function* chunks(arr: number[]) {
 }
 
 export function partOne(input: Buffer) {
-  const answer = F.flow(parse, countAsc(), F.tap(console.log));
+  const answer = F.flow(parse, countAsc());
 
   return answer(input);
 }
 
 export function partTwo(input: Buffer) {
-  const answer = F.flow(
-    parse,
-    (arr) => Array.from(chunks(arr)),
-    countAsc(),
-    F.tap(console.log),
-  );
+  const answer = F.flow(parse, (arr) => Array.from(chunks(arr)), countAsc());
 
   return answer(input);
 }
