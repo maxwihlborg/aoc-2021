@@ -2,7 +2,7 @@
   "name": "@maxwihlborg/aoc-2021",
   "version": "1.0.0",
   "scripts": {
-    "start": "mocha -r esbuild-register"
+    "start": "mocha -r esbuild-register -w --extension ts"
   },
   "dependencies": {
     "lodash": "^4.17.21"
