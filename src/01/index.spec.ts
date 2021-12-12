@@ -10,10 +10,6 @@ const INPUT_FILE = path.resolve(__dirname, "./input.txt");
 const PART_ONE = 7;
 const PART_TWO = 5;
 
-const log = (name: string) => (n: unknown) => {
-  console.log(name, n);
-};
-
 describe("day 01", () => {
   it("partOne (sample)", async () => {
     expect(partOne(await fs.readFile(SAMPLE_FILE))).to.equal(PART_ONE);

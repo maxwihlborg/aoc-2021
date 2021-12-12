@@ -24,7 +24,7 @@ describe('day <%= String(name).padStart(2, '0') %>', ()=>{
     expect(tap(console.log, partOne(await fs.readFile(INPUT_FILE)))).to.be.a('number')
   })
 
-  it('partTwo (input)', async () => {
+  it('partTwo (sample)', async () => {
     expect(partTwo(await fs.readFile(SAMPLE_FILE))).to.equal(PART_TWO)
   })
 
