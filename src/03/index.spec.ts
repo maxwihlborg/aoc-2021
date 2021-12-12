@@ -25,7 +25,7 @@ describe("day 03", () => {
     expect(partTwo(await fs.readFile(SAMPLE_FILE), 5)).to.equal(PART_TWO);
   });
 
-  it.only("partTwo (input)", async () => {
+  it("partTwo (input)", async () => {
     expect(
       tap(console.log, partTwo(await fs.readFile(INPUT_FILE), 12)),
     ).to.be.a("number");
