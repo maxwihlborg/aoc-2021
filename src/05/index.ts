@@ -30,20 +30,15 @@ interface Line {
 }
 
 function* expandLine({ start, end }: Line): Generator<Pos> {
-  if (start.x === end.x) {
-    let iter = F.min([start.y, end.y]);
-    const max = F.max([start.y, end.y]);
-    do {
-      yield { y: iter++, x: start.x };
-    } while (iter <= max);
-  }
-  if (start.y === end.y) {
-    let iter = F.min([start.x, end.x]);
-    const max = F.max([start.x, end.x]);
-    do {
-      yield { x: iter++, y: start.y };
-    } while (iter <= max);
-  }
+  const dx = Math.sign(end.x - start.x);
+  const dy = Math.sign(end.y - start.y);
+  let point = Object.assign({}, start);
+  yield point;
+  do {
+    point.x += dx;
+    point.y += dy;
+    yield point;
+  } while (!(point.x === end.x && point.y === end.y));
 }
 
 function debugGrid(data: number[], width: number, height: number) {
@@ -58,44 +53,79 @@ function debugGrid(data: number[], width: number, height: number) {
   console.log(debug);
 }
 
+function getDimensions(lines: Line[]) {
+  const points = F.flatMap(({ start, end }) => [start, end], lines);
+  const min = {
+    x: F.min(F.map("x", points)),
+    y: F.min(F.map("y", points)),
+  };
+  const max = {
+    // need to add one in since zero-indexed
+    x: F.max(F.map("x", points)) + 1,
+    y: F.max(F.map("y", points)) + 1,
+  };
+  const width = max.x - min.x;
+  const height = max.y - min.y;
+
+  return { min, max, width, height };
+}
+const isStright = ({ start, end }: Line) =>
+  start.x === end.x || start.y === end.y;
+
+const getMinMax = ({ start, end }: Line) => {
+  return {
+    min: {
+      x: Math.min(start.x, end.x),
+      y: Math.min(start.y, end.y),
+    },
+    max: {
+      x: Math.max(start.x, end.x),
+      y: Math.max(start.y, end.y),
+    },
+  };
+};
+
+const isDiagonal = (line: Line) => {
+  const { min, max } = getMinMax(line);
+  const dx = max.x - min.x;
+  const dy = max.y - min.y;
+  return dx === dy;
+};
+
+function buildGrid(lines: Line[]) {
+  const { min, width, height } = getDimensions(lines);
+  const data = new Array(width * height).fill(0);
+
+  for (const line of lines) {
+    for (const { x, y } of expandLine(line)) {
+      const ox = x - min.x;
+      const oy = y - min.y;
+
+      data[ox + oy * width] += 1;
+    }
+  }
+  //debugGrid(data, width, height);
+  return data;
+}
+
 export function partOne(input: Buffer) {
   const answer = F.flow(
     parse,
-    F.filter(({ start, end }) => start.x === end.x || start.y === end.y),
-    (lines) => {
-      const points = F.flatMap(({ start, end }) => [start, end], lines);
-      const min = {
-        x: F.min(F.map("x", points)),
-        y: F.min(F.map("y", points)),
-      };
-      const max = {
-        // need to add one in since zero-indexed
-        x: F.max(F.map("x", points)) + 1,
-        y: F.max(F.map("y", points)) + 1,
-      };
-      const w = max.x - min.x;
-      const h = max.y - min.y;
-
-      const data = new Array(w * h).fill(0);
-
-      for (const line of lines) {
-        for (const { x, y } of expandLine(line)) {
-          const ox = x - min.x;
-          const oy = y - min.y;
-
-          data[ox + oy * w] += 1;
-        }
-      }
-      //debugGrid(data, w, h);
-      return F.sumBy((n) => (n > 1 ? 1 : 0), data);
-    },
+    F.filter((line: Line) => isStright(line)),
+    buildGrid,
+    F.sumBy((n) => (n > 1 ? 1 : 0)),
   );
 
   return answer(input);
 }
 
 export function partTwo(input: Buffer) {
-  const answer = F.flow(parse, F.constant(0));
+  const answer = F.flow(
+    parse,
+    F.filter((line: Line) => isStright(line) || isDiagonal(line)),
+    buildGrid,
+    F.sumBy((n) => (n > 1 ? 1 : 0)),
+  );
 
   return answer(input);
 }
