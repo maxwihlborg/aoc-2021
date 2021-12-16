@@ -8,14 +8,14 @@ const SAMPLE_FILE = path.resolve(__dirname, "./sample.txt");
 const INPUT_FILE = path.resolve(__dirname, "./input.txt");
 
 const PART_ONE = 26;
-const PART_TWO = 0;
+const PART_TWO = 61229;
 
 describe("day 08", () => {
-  it.only("partOne (sample)", async () => {
+  it("partOne (sample)", async () => {
     expect(partOne(await fs.readFile(SAMPLE_FILE))).to.equal(PART_ONE);
   });
 
-  it.only("partOne (input)", async () => {
+  it("partOne (input)", async () => {
     expect(tap(console.log, partOne(await fs.readFile(INPUT_FILE)))).to.be.a(
       "number",
     );
