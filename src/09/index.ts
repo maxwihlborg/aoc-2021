@@ -49,7 +49,7 @@ function* lowPoints(data: number[], w: number, h: number) {
       }
     }
     if (low) {
-      yield n + 1;
+      yield [n, x, y];
     }
   }
 }
@@ -58,14 +58,48 @@ export function partOne(input: Buffer) {
   const answer = F.flow(
     parse,
     ({ data, w, h }) => Array.from(lowPoints(data, w, h)),
+    F.map(F.flow(F.get(0), F.add(1))),
     F.sum,
   );
 
   return answer(input);
 }
 
+const basinSize = (
+  data: number[],
+  sx: number,
+  sy: number,
+  w: number,
+  h: number,
+) => {
+  const step = (visited: Set<number>, acc: number, x: number, y: number) => {
+    const n = data[x + y * w];
+    for (let [nx, ny] of neigh(x, y, w, h)) {
+      const c = nx + ny * w;
+      const b = data[c];
+      if (!(b > n && b !== 9 && !visited.has(c))) continue;
+      visited.add(c);
+      acc += step(visited, 1, nx, ny);
+    }
+    return acc;
+  };
+  return step(new Set([sx + sy * w]), 1, sx, sy);
+};
+
+function* basinSizes(data: number[], w: number, h: number) {
+  for (const [_n, x, y] of lowPoints(data, w, h)) {
+    yield basinSize(data, x, y, w, h);
+  }
+}
+
 export function partTwo(input: Buffer) {
-  const answer = F.flow(parse, F.constant(0));
+  const answer = F.flow(
+    parse,
+    ({ data, w, h }) => Array.from(basinSizes(data, w, h)),
+    (n) => n.sort((a, b) => b - a),
+    F.take(3),
+    F.reduce((acc, n) => acc * n, 1),
+  );
 
   return answer(input);
 }
